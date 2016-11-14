@@ -7,9 +7,9 @@ import numpy as np
 
 def load_wave(filename):
     with open(filename,'r') as f:
-        #names = next(f) # skip first row
+        names = next(f) # skip first row
         df = pd.DataFrame(l.rstrip().split(',') for l in f)
-    return df
+    return df,names
 
 def load_waves():
     dfs = []

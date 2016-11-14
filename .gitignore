@@ -1,1 +1,4 @@
 *.dat
+*.csv
+*.rdata
+*.dta
