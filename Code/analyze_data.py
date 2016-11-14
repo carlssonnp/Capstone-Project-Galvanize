@@ -8,6 +8,11 @@ import pandas as pd
 from statsmodels.regression.linear_model import OLS, WLS
 from statsmodels.api import add_constant
 
+def create_columns(num_vars):
+    col_nums = xrange(1,num_vars + 1)
+    columns = [('A00' + str(col_num)) if col_num <10 else ('A0' + str(col_num)) for col_num in col_nums]
+    return columns
+
 def choose_columns(df_in,columns):
     df_out = df_in.ix[:,columns]
     return df_out
@@ -21,8 +26,13 @@ def remove_negatives(df_in):
 
 def reverse_order(df_in):
     dic = {1.0 : 4.0, 2.0: 3.0, 3.0: 2.0, 4.0:1.0, 5.0: 0.0}
-    for column in df.columns:
-       df_in[column] = df_in[column].replace(dic)
+    for column in df_in.columns:
+        vals = df_in[column].unique()
+        if 1 in vals and 0 in vals:
+            pass
+        else:
+            print column
+            df_in[column] = df_in[column].replace(dic)
     return df_in
 
 
@@ -80,8 +90,10 @@ if __name__ == '__main__':
     df_EVS = load_stata(EVS_filename)
     df_total = pd.concat((df_WVS, df_EVS))
     df_total.reset_index(inplace = True)
-    columns = ['A001','A002','A003','A004','A005','A006','A007','A008','A009','S003']
+    #columns = ['A001','A002','A003','A004','A005','A006','A007','A008','A009','S003','A032']
+    columns = create_columns(40) + 'S003'
     df = choose_columns(df_total, columns )
+    df_old = df.copy()
     df = reverse_order(df)
     df = remove_negatives(df)
 
