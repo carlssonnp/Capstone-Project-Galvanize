@@ -1,0 +1,1 @@
+This is a folder on my local machine that holds the European Values Survey data in various formats; due to size constraints, this data will not be uploaded to Github. The code dictionary, however, can be accessed here. 
