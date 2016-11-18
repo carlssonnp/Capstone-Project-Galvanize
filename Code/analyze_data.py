@@ -1,39 +1,24 @@
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from sklearn.cluster import KMeans, DBSCAN
 import numpy as np
 from read_data import load_csv, load_stata
 import pandas as pd
 from statsmodels.regression.linear_model import OLS, WLS
 from statsmodels.api import add_constant
+from clean_data import *
 
-def create_columns(num_vars):
-    col_nums = xrange(1,num_vars + 1)
-    columns = [('A00' + str(col_num)) if col_num <10 else ('A0' + str(col_num)) for col_num in col_nums]
-    return columns
+# def count_missing(df_old):
+#     df_out = df_old.copy()
+#     missing = []
+#     for column in df_out:
+#         df_out[column].fillna(-10)
+#         missing.append(sum(df_out[column] < 0))
+#     return missing, df_out
 
-def choose_columns(df_in,columns):
-    df_out = df_in.ix[:,columns]
-    return df_out
 
 
-def remove_negatives(df_in):
-    for column in df_in.columns:
-        column_mean = df_in[df_in[column] > 0][column].mean()
-        df_in[column] = df_in[column].apply(lambda x: x if x >= 0 else column_mean)
-    return df_in
-
-def reverse_order(df_in):
-    dic = {1.0 : 4.0, 2.0: 3.0, 3.0: 2.0, 4.0:1.0, 5.0: 0.0}
-    for column in df_in.columns:
-        vals = df_in[column].unique()
-        if 1 in vals and 0 in vals:
-            pass
-        else:
-            print column
-            df_in[column] = df_in[column].replace(dic)
-    return df_in
 
 
 def pca_transform(df_in, num_components = None):
@@ -85,21 +70,65 @@ if __name__ == '__main__':
     WVS_filename = '../WVS/Original_CSV_Files/integrated/longitudinal.csv'
     EVS_filename = '../EVS/ZA4804_v3-0-0.dta'
 
-
+    # load longitudinal data
     df_WVS = load_csv(WVS_filename)
     df_EVS = load_stata(EVS_filename)
+    #fill in EVS wave variable
+    df_EVS = fill_wave(df_EVS)
+    # append data frames
     df_total = pd.concat((df_WVS, df_EVS))
+    #reset index
     df_total.reset_index(inplace = True)
-    #columns = ['A001','A002','A003','A004','A005','A006','A007','A008','A009','S003','A032']
-    columns = create_columns(40) + 'S003'
+    # create A variable columns; S003 is country, S002 is wave, S020 is year
+    columns = create_columns(222) + ['S003'] + ['S002'] + ['S020']
     df = choose_columns(df_total, columns )
-    df_old = df.copy()
+
+
     df = reverse_order(df)
-    df = remove_negatives(df)
+    df_old = df.copy()
+    df = change_to_nan(df)
+    #df = get_dummies(df,['A044','A045','A050','A169','A174'])
+    #df = remove_negatives(df)
+    ##### TEMPORARY
+    df1 = group_by_wave(1,df)
+    df2 = group_by_wave(2,df)
+    df3 = group_by_wave(3,df)
+    df4 = group_by_wave(4,df)
+    df5 = group_by_wave(5,df)
+    df6 = group_by_wave(6,df)
+
+    df1_final = output_cleaned_df(df1)
+    df2_final = output_cleaned_df(df2)
+    df3_final = output_cleaned_df(df3)
+    df4_final = output_cleaned_df(df4)
+    df5_final = output_cleaned_df(df5)
+    df6_final = output_cleaned_df(df6)
+    df_final = output_cleaned_df(df)
+
+    df1_for_transform = df1_final.dropna(axis = 0)
+    df2_for_transform = df2_final.dropna(axis = 0)
+    df3_for_transform = df3_final.dropna(axis = 0)
+    df4_for_transform = df4_final.dropna(axis = 0)
+    df5_for_transform = df5_final.dropna(axis = 0)
+    df6_for_transform = df6_final.dropna(axis = 0)
 
 
+    df_for_transform = df[for_transform]
+    df_for_transform = get_dummies(df_for_transform)
+    df_for_transform = df_for_transform.dropna(axis = 0)
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler(with_std = False)
+    df_test = scaler.fit_transform(df6_for_transform)
+    scaler = MinMaxScaler(feature_range=(0, 10))
+    df6 = df6_for_transform.apply(lambda x: MinMaxScaler(feature_range = (1,10)).fit_transform(x))
+    df_transformed, explained_variance, pca = pca_transform(df6.iloc[:,1:10] )
     # regression analysis
-    regression_columns = ['A001','A002','A003','A004','A005','A006','A007','A009']
+    # regression_columns = ['A001','A002','A003','A004','A005','A006','A007','A009']
+    # regression_columns = list(df.columns)
+    # regression_columns.remove('S003')
+    # regression_columns.remove('A008')
+    print most_important_cols(pca.components_,df6_for_transform)
+
     overall_results = regression(df,'A008',regression_columns)
     by_country_results = regression_by_country(df,'A008',regression_columns)
 
@@ -109,7 +138,7 @@ if __name__ == '__main__':
     df_transformed, explained_variance, pca = pca_transform(df_no_country)
     df_transformed2, explained_variance2, pca2 = pca_transform(df_no_country2)
     # scree_plot(explained_variance)
-    scree_plot(explained_variance2)
+    #scree_plot(explained_variance2[:10])
     pca_reg = regression_pca(df_transformed,df['A008'],[0,1,2,3,4,5,6])
 
 

@@ -15,3 +15,5 @@ with open('dict.txt','r') as f:
     d = {}
     for country in country_list2:
         d[country[0]] = country[1]
+
+    int_dic = {int(key): item for key, item in d.iteritems() }
