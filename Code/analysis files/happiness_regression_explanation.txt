@@ -1,9 +1,0 @@
-This regression analysis used variables A001-A009 (excluding A008) to predict A008, which is a response to the question:
-how happy are you (4: very happy, 1 not at all happy ). The explanatory variables are mainly questions about how important family,
-friends, work, leisure, etc. are in an individual's life (4: very important). A009 represents the individual's state of health
-(5: very good, 1: very poor).
-
-This is just a preliminary analysis, as there are hundreds more survey questions to look at , but I thought it would be interesting
-to take a look at predictors of happiness. Looking at the results of the regression, it is interesting to note that
-increased importance of anything but work (A005, which has a negative coefficient) is associated with increased happiness. In
-particular, state of health has a huge effect on perceived happiness, which is not unexpected. 
