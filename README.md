@@ -5,6 +5,7 @@ In this project, I use data from the World Values Survey and European Values Sur
 space, because the surveys cover over 100 countries across the globe, and time, because the surveys are cross sectional, covering the
 years 1981 through 2014. Each survey contains hundreds of questions on a diverse set of topics, including politics, family, economics,
 religion, and more. While the surveys hold great potential for comparison between countries and time periods, the sheer volume of questions makes it difficult to make comparisons between countries (space) and survey period (time) on a question by question basis difficult. I hope to make this comparison easier by reducing the dimensionality of the survey using Principal Component Analysis (PCA), finding overaching themes that are explained by clusters of questions, and then presenting the results in pictoral format via a Flask app.  
+
 Quick description of folders: 
 
 Code: contains all of the code necesaarry for the project, including cleaning files, analysis files, mapping files, and app files. 
