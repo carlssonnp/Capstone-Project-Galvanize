@@ -11,6 +11,13 @@ app = Flask(__name__)
 def index():
     return 'hi'
 
+@app.route('/coolgraph')
+def show_graph():
+    with open('html_for_graph.html') as f:
+        line = f.read()
+    return line
+
+
 @app.route('/all')
 def wave_all():
     with open('WaveAll.html') as f:
