@@ -7,7 +7,7 @@ from scipy.stats import pearsonr
 from plotly_choropleth import plot_choropleth
 import question_selector
 from sklearn.cluster import KMeans
-from country_dictionary import int_dic
+from country_dictionary import country_dictionary
 import pickle
 
 

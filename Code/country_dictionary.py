@@ -5,7 +5,7 @@ with open('country_codes.txt','r') as f:
     countries = f.read().split('\r')
 
     countries_id_to_name = []
-    for country in country_list[:-6]:
+    for country in countries[:-6]:
         id_name_split = country.split('##')
         countries_id_to_name.append(id_name_split)
 

@@ -1,6 +1,5 @@
 from flask import Flask, request
 app = Flask(__name__)
-from test import r,t
 from analyze_surveys import Wave
 import pickle
 
@@ -88,7 +87,7 @@ def word_counter():
 	</head>'''
     wave = request.form['user_input'].split()[0]
     pc = int(request.form['user_input'].split()[1])
-    ht = 'Wave' +' ' + str(wave) +'_PC' + str(pc) + '.html'
+    ht = 'html_files/Wave' +' ' + str(wave) +'_PC' + str(pc) + '.html'
 
     with open(ht) as f:
         line+= f.read()
@@ -97,7 +96,7 @@ def word_counter():
     df = pd.read_csv('codebook.csv', header = -1)
     df.index = df[2]
 
-    correlation_dic = pickle.load(open('Wave' + str(wave) + '_correlation_dic.pkl','r'))
+    correlation_dic = pickle.load(open('pickled_correlation_dictionaries/Wave' + str(wave) + '_correlation_dic.pkl','r'))
     for i in xrange(3):
         line+= ''' Question %s: %s (Correlation: %s) <br/>''' %(correlation_dic[pc].index[i],df.loc[correlation_dic[pc].index[i],3],round(correlation_dic[pc][i],2))
     #line+= '''<p> Questions most correlated with this component: <br/> %s, %s </p>''' %(wave1.survey.iloc[1,1],t)
