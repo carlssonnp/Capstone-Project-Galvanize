@@ -11,14 +11,14 @@ def create_columns_a(num_vars):
             columns.append('A' + str(col_num))
 
     bad_cols = []
-    bad_cols.append(['A0' + str(col_num) for col_num in xrange(10,20)])
-    bad_cols.append(['A0' + str(col_num) for col_num in xrange(25,57)])
-    bad_cols.append(['A0' + str(col_num) for col_num in xrange(64,100)])
-    bad_cols.append(['A' + str(col_num) for col_num in xrange(100,107)])
-    bad_cols.append(['A' + str(col_num) for col_num in xrange(123,166)])
-    bad_cols.append(['A' + str(col_num) for col_num in xrange(168,170)])
-    bad_cols.append(['A' + str(col_num) for col_num in xrange(174,200)])
-    bad_cols.append(['A' + str(col_num) for col_num in xrange(208,213)])
+    bad_cols.extend(['A0' + str(col_num) for col_num in xrange(10,20)])
+    bad_cols.extend(['A0' + str(col_num) for col_num in xrange(25,57)])
+    bad_cols.extend(['A0' + str(col_num) for col_num in xrange(64,100)])
+    bad_cols.extend(['A' + str(col_num) for col_num in xrange(100,107)])
+    bad_cols.extend(['A' + str(col_num) for col_num in xrange(123,166)])
+    bad_cols.extend(['A' + str(col_num) for col_num in xrange(168,170)])
+    bad_cols.extend(['A' + str(col_num) for col_num in xrange(174,200)])
+    bad_cols.extend(['A' + str(col_num) for col_num in xrange(208,213)])
 
     good_cols = set(columns) - set(bad_cols)
     return sorted(list(good_cols))
@@ -36,8 +36,8 @@ def create_columns_b(num_vars):
             columns.append('B' + str(col_num))
 
     bad_cols = []
-    bad_cols.append(['B00' + str(col_num) for col_num in xrange(8,10)])
-    bad_cols.append(['B0' + str(col_num) for col_num in xrange(10,18)])
+    bad_cols.extend(['B00' + str(col_num) for col_num in xrange(8,10)])
+    bad_cols.extend(['B0' + str(col_num) for col_num in xrange(10,18)])
 
     good_cols = set(columns) - set(bad_cols)
     return sorted(list(good_cols))

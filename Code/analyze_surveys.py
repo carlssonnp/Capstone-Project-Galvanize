@@ -6,6 +6,9 @@ from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 from scipy.stats import pearsonr
 from plotly_choropleth import plot_choropleth
 import question_selector
+from sklearn.cluster import KMeans
+from country_dictionary import int_dic
+import pickle
 
 
 
@@ -242,6 +245,8 @@ class Wave():
         self.group_by_country()
         self.normalize_pca_components()
         self.calculate_country_distances()
+        self.pickle_correlation_dic()
+        self.kmeans(7)
 
     def return_principal_component_questions(self,num_components,correlation_threshold):
         for component_number in xrange(1,num_components):
@@ -253,7 +258,28 @@ class Wave():
             component = self.correlation_dic_nmf[component_number]
             print component[np.abs(component)>correlation_threshold]
 
-    def output_graph_data(self):
+    def kmeans(self,cluster_number):
+        self.k_means = []
+        self.labels = []
+        for i in xrange(cluster_number):
+            kmeans = KMeans(i + 1)
+            kmeans.fit(self.grouped_by_country_pca[[1,2,3,4]])
+            self.k_means.append(kmeans)
+            labels = kmeans.predict(self.grouped_by_country_pca[[1,2,3,4]])
+            self.labels.append(labels)
+
+    def k_means_graph(self):
+        inertias = [cluster.inertia_ for cluster in self.k_means]
+        plt.plot(xrange(1,len(self.k_means) + 1),inertias)
+        plt.show()
+
+    def pickle_correlation_dic(self):
+        with open('Wave' + str(self.wave_number) + '_correlation_dic.pkl','w') as f:
+            pickle.dump(self.correlation_dic_pca,f)
+
+
+
+    def output_graph_data(self,cluster_number):
         test = []
         counter = 0
         for source in self.country_distances.columns:
@@ -273,11 +299,12 @@ class Wave():
         test = np.array(test)
         test_out = pd.DataFrame(test)
         test_out.columns = ['Source','Target','Type', 'Id', 'Weight', 'Average Degree']
-        test_out.to_csv('edges.csv')
+        test_out.to_csv('Wave' + str(self.wave_number) + 'edges.csv')
         nodes_out = pd.DataFrame(self.country_distances.index)
         nodes_out.columns = ['Id']
         nodes_out['Label'] = nodes_out['Id'].replace(int_dic)
-        nodes_out.to_csv('nodes.csv')
+        nodes_out['Kmeans'] = self.labels[cluster_number + 1]
+        nodes_out.to_csv('Wave' + str(self.wave_number) + 'nodes.csv')
 
 
 
@@ -289,3 +316,5 @@ if __name__ == '__main__':
     Wave4 = Wave(4,survey.survey_cleaned)
     Wave5 = Wave(5,survey.survey_cleaned)
     Wave6 = Wave(6,survey.survey_cleaned)
+    wave_list = [Wave1, Wave2, Wave3, Wave4, Wave5, Wave6]
+    plot_all_graphs(wave_list)

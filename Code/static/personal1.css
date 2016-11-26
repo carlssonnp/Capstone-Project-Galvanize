@@ -1,0 +1,22 @@
+body {
+	font-family: sans-serif;
+	background-color: darkgray;
+}
+
+h1 {
+
+	text-align: center;
+}
+
+p {
+	text-align: left;
+	margin-left: 375px;
+}
+
+img {
+    float: left;
+    margin: 0 0 10px 10px;
+}
+ul {
+	margin-left: 350px;
+}

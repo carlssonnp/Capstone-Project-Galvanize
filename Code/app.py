@@ -1,6 +1,11 @@
 from flask import Flask, request
 app = Flask(__name__)
+from test import r,t
+from analyze_surveys import Wave
+import pickle
 
+
+import pandas as pd
 
 
 # home page
@@ -67,7 +72,7 @@ def wave_1():
 
 @app.route('/submit')
 def submission_page():
-    return '''
+    return '''<p> Enter wave number (1-6) below: </p>
         <form action="/showmap" method='POST' >
             <input type="text" name="user_input" />
             <input type="submit" />
@@ -76,16 +81,35 @@ def submission_page():
 
 @app.route('/showmap', methods=['POST'] )
 def word_counter():
-    wave = request.form['user_input']
-    ht = 'Wave' + str(wave) + '.html'
+    line = '''<head>
+		<meta charset="UTF-8">
+		<title>Nils-Carlsson</title>
+		<link rel="stylesheet" href="static/personal2.css">
+	</head>'''
+    wave = request.form['user_input'].split()[0]
+    pc = int(request.form['user_input'].split()[1])
+    ht = 'Wave' +' ' + str(wave) +'_PC' + str(pc) + '.html'
+
     with open(ht) as f:
-        line = f.read()
+        line+= f.read()
+
+    line+= '''<p> Questions most correlated with this component: <br/> <br/> '''
+    df = pd.read_csv('codebook.csv', header = -1)
+    df.index = df[2]
+
+    correlation_dic = pickle.load(open('Wave' + str(wave) + '_correlation_dic.pkl','r'))
+    for i in xrange(3):
+        line+= ''' Question %s: %s (Correlation: %s) <br/>''' %(correlation_dic[pc].index[i],df.loc[correlation_dic[pc].index[i],3],round(correlation_dic[pc][i],2))
+    #line+= '''<p> Questions most correlated with this component: <br/> %s, %s </p>''' %(wave1.survey.iloc[1,1],t)
+    line += '</p>'
+    line+= 'Enter wave number (1-6) below: '
     line+= '''
         <form action="/showmap" method='POST' >
             <input type="text" name="user_input" />
             <input type="submit" />
         </form>
         '''
+
     return line
 
 
