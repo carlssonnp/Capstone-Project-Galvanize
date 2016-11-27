@@ -34,6 +34,8 @@ def plot_choropleth(wave,component_number):
     locations_index = pd.Series(wave.grouped_by_country_pca.index)
     locations_index = locations_index[(locations_index!= 499) & (locations_index!= 688) ]
     locations_string = locations_index.replace(country_dictionary)
+    print len(locations_index)
+    print len(locations_string)
     component_values = pd.Series(wave.grouped_by_country_pca.loc[locations_index,component_number])
     component_values_scaled = scaler.fit_transform(component_values)
 
@@ -41,9 +43,16 @@ def plot_choropleth(wave,component_number):
     question2 = wave.correlation_dic_pca[component_number].index[1]
     question3 = wave.correlation_dic_pca[component_number].index[2]
 
-    hover_text =  ['\n' + str(country[0]) +'\n\n'+ question1+': '  + str(int(country[1][question1])) +
+    # plot_grouped_by_country = wave.grouped_by_country_pca.copy()
+    # plot_grouped_by_country.drop([499,688],inplace = True)
+    # plot_grouped_by_country.index = locations_string
+
+
+    hover_text =  ['\n' + str(locations_string.iloc[i]) +'\n\n'+ question1+': '  + str(int(country[1][question1])) +
     '\n' + question2 +  ': ' + str(int(country[1][question2])) + '\n' +  question3 +  ': '
-    + str(int(country[1][question3])) for country in wave.grouped_by_country_pca.loc[locations_index,:].iterrows()]
+    + str(int(country[1][question3])) for i,country in enumerate(wave.grouped_by_country_pca.loc[locations_index,:].iterrows())]
+
+
 
     data = [ dict(
             type = 'choropleth', locationmode = 'country names',

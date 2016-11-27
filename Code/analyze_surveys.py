@@ -4,11 +4,12 @@ from sklearn.decomposition import PCA,NMF
 from sklearn.preprocessing import MinMaxScaler, normalize
 from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 from scipy.stats import pearsonr
-from plotly_choropleth import plot_choropleth
+from plotly_choropleth import plot_choropleth, plot_all_graphs
 import question_selector
 from sklearn.cluster import KMeans
 from country_dictionary import country_dictionary
 import pickle
+import matplotlib.pyplot as plt
 
 
 
@@ -284,7 +285,7 @@ class Wave():
         counter = 0
         for source in self.country_distances.columns:
             for target in self.country_distances.index:
-                if self.country_distances.loc[source,target] <5 and source!=target:
+                if self.country_distances.loc[source,target] <5.5 and source!=target:
                     test_sub = []
                     similarity = 1./self.country_distances.loc[source,target]
                     test_sub.append(source)
@@ -302,7 +303,7 @@ class Wave():
         test_out.to_csv('Wave' + str(self.wave_number) + 'edges.csv')
         nodes_out = pd.DataFrame(self.country_distances.index)
         nodes_out.columns = ['Id']
-        nodes_out['Label'] = nodes_out['Id'].replace(int_dic)
+        nodes_out['Label'] = nodes_out['Id'].replace(country_dictionary)
         nodes_out['Kmeans'] = self.labels[cluster_number + 1]
         nodes_out.to_csv('Wave' + str(self.wave_number) + 'nodes.csv')
 
@@ -317,4 +318,4 @@ if __name__ == '__main__':
     Wave5 = Wave(5,survey.survey_cleaned)
     Wave6 = Wave(6,survey.survey_cleaned)
     wave_list = [Wave1, Wave2, Wave3, Wave4, Wave5, Wave6]
-    plot_all_graphs(wave_list)
+    #plot_all_graphs(wave_list)
