@@ -275,7 +275,7 @@ class Wave():
         plt.show()
 
     def pickle_correlation_dic(self):
-        with open('Wave' + str(self.wave_number) + '_correlation_dic.pkl','w') as f:
+        with open('../pickled_correlation_dictionaries/Wave' + str(self.wave_number) + '_correlation_dic.pkl','w') as f:
             pickle.dump(self.correlation_dic_pca,f)
 
 
