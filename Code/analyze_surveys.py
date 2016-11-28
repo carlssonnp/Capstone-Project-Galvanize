@@ -275,7 +275,7 @@ class Wave():
         plt.show()
 
     def pickle_correlation_dic(self):
-        with open('../pickled_correlation_dictionaries/Wave' + str(self.wave_number) + '_correlation_dic.pkl','w') as f:
+        with open('pickled_correlation_dictionaries/Wave' + str(self.wave_number) + '_correlation_dic.pkl','w') as f:
             pickle.dump(self.correlation_dic_pca,f)
 
 
@@ -285,7 +285,7 @@ class Wave():
         counter = 0
         for source in self.country_distances.columns:
             for target in self.country_distances.index:
-                if self.country_distances.loc[source,target] <5.5 and source!=target:
+                if self.country_distances.loc[source,target] <5 and source!=target:
                     test_sub = []
                     similarity = 1./self.country_distances.loc[source,target]
                     test_sub.append(source)
@@ -300,12 +300,13 @@ class Wave():
         test = np.array(test)
         test_out = pd.DataFrame(test)
         test_out.columns = ['Source','Target','Type', 'Id', 'Weight', 'Average Degree']
-        test_out.to_csv('Wave' + str(self.wave_number) + 'edges.csv')
+        test_out.to_csv('Gephi_Files/Wave' + str(self.wave_number) + 'edges.csv')
         nodes_out = pd.DataFrame(self.country_distances.index)
         nodes_out.columns = ['Id']
         nodes_out['Label'] = nodes_out['Id'].replace(country_dictionary)
+        nodes_out['Label'] = nodes_out['Label'].replace({499:'Montenegro', 688: 'Serbia'})
         nodes_out['Kmeans'] = self.labels[cluster_number + 1]
-        nodes_out.to_csv('Wave' + str(self.wave_number) + 'nodes.csv')
+        nodes_out.to_csv('Gephi_Files/Wave' + str(self.wave_number) + 'nodes.csv')
 
 
 

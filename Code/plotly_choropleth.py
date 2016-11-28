@@ -34,10 +34,9 @@ def plot_choropleth(wave,component_number):
     locations_index = pd.Series(wave.grouped_by_country_pca.index)
     locations_index = locations_index[(locations_index!= 499) & (locations_index!= 688) ]
     locations_string = locations_index.replace(country_dictionary)
-    print len(locations_index)
-    print len(locations_string)
     component_values = pd.Series(wave.grouped_by_country_pca.loc[locations_index,component_number])
     component_values_scaled = scaler.fit_transform(component_values)
+    component_values_scaled = np.round(component_values_scaled,2)
 
     question1 = wave.correlation_dic_pca[component_number].index[0]
     question2 = wave.correlation_dic_pca[component_number].index[1]
