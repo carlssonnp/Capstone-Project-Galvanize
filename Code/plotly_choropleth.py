@@ -57,7 +57,7 @@ def plot_choropleth(wave,component_number):
             type = 'choropleth', locationmode = 'country names',
             locations = locations_string,
             #z = df['GDP (BILLIONS)'],
-            z = component_values_scaled,
+            z = -1*component_values_scaled,
             text = hover_text,
             colorscale = [[0,"rgb(5, 10, 172)"],[0.35,"rgb(40, 60, 190)"],[0.5,"rgb(70, 100, 245)"],\
                 [0.6,"rgb(90, 120, 245)"],[0.7,"rgb(106, 137, 247)"],[1,"rgb(220, 220, 220)"]],

@@ -83,7 +83,7 @@ def word_counter():
     line = '''<head>
 		<meta charset="UTF-8">
 		<title>Nils-Carlsson</title>
-		<link rel="stylesheet" href="static/personal2.css">
+		<link rel="stylesheet" href="static/personal3.css">
 	</head>'''
     wave = request.form['user_input'].split()[0]
     pc = int(request.form['user_input'].split()[1])

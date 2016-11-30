@@ -3,13 +3,39 @@ import pandas as pd
 from sklearn.decomposition import PCA,NMF
 from sklearn.preprocessing import MinMaxScaler, normalize
 from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
-from scipy.stats import pearsonr
+from scipy.stats import pearsonr, percentileofscore
 from plotly_choropleth import plot_choropleth, plot_all_graphs
 import question_selector
 from sklearn.cluster import KMeans
 from country_dictionary import country_dictionary
 import pickle
 import matplotlib.pyplot as plt
+
+
+def plot_change():
+    wv1 = Wave1.grouped_by_country_pca['pc1_percentile']
+    wv2 = Wave2.grouped_by_country_pca['pc1_percentile']
+    wv3 = Wave3.grouped_by_country_pca['pc1_percentile']
+    wv4 = Wave4.grouped_by_country_pca['pc1_percentile']
+    wv5 = Wave5.grouped_by_country_pca['pc1_percentile']
+    wv6 = Wave6.grouped_by_country_pca['pc1_percentile']
+    US = pd.Series([wv2[840],wv3[840],wv4[840],wv5[840]])
+    Chile = pd.Series([wv2[152],wv3[152],wv4[152],wv5[152]])
+    Russia = pd.Series([wv2[643],wv3[643],wv5[643]])
+    US_x = [1994,1998,2004,2009]
+    chile_x = [1994,1998,2004,2009]
+    russia_x = [1994,1998,2009]
+
+    plot1, = plt.plot(US_x,US)
+    plot2, = plt.plot(chile_x,Chile)
+    plot3, = plt.plot(russia_x,Russia)
+    plt.legend([plot1,plot2,plot3],["US", "Chile",'Russia'])
+    #plt.xlabel('Year')
+    #plt.ylabel('Percentile of liberal social values/secularism component')
+    plt.show()
+
+
+
 
 
 
@@ -248,6 +274,7 @@ class Wave():
         self.calculate_country_distances()
         self.pickle_correlation_dic()
         self.kmeans(7)
+        self.calculate_percentiles()
 
     def return_principal_component_questions(self,num_components,correlation_threshold):
         for component_number in xrange(1,num_components):
@@ -259,6 +286,9 @@ class Wave():
             component = self.correlation_dic_nmf[component_number]
             print component[np.abs(component)>correlation_threshold]
 
+    def calculate_percentiles(self):
+        self.grouped_by_country_pca['pc1_percentile'] = [percentileofscore(-self.grouped_by_country_pca[1],-i) for i in self.grouped_by_country_pca[1]]
+
     def kmeans(self,cluster_number):
         self.k_means = []
         self.labels = []
@@ -268,6 +298,7 @@ class Wave():
             self.k_means.append(kmeans)
             labels = kmeans.predict(self.grouped_by_country_pca[[1,2,3,4]])
             self.labels.append(labels)
+        self.grouped_by_country_pca['labels'] = self.labels[2]
 
     def k_means_graph(self):
         inertias = [cluster.inertia_ for cluster in self.k_means]
@@ -285,7 +316,7 @@ class Wave():
         counter = 0
         for source in self.country_distances.columns:
             for target in self.country_distances.index:
-                if self.country_distances.loc[source,target] <5 and source!=target:
+                if self.country_distances.loc[source,target] <6 and source!=target:
                     test_sub = []
                     similarity = 1./self.country_distances.loc[source,target]
                     test_sub.append(source)
