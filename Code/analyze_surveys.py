@@ -12,34 +12,6 @@ import pickle
 import matplotlib.pyplot as plt
 
 
-def plot_change():
-    wv1 = Wave1.grouped_by_country_pca['pc1_percentile']
-    wv2 = Wave2.grouped_by_country_pca['pc1_percentile']
-    wv3 = Wave3.grouped_by_country_pca['pc1_percentile']
-    wv4 = Wave4.grouped_by_country_pca['pc1_percentile']
-    wv5 = Wave5.grouped_by_country_pca['pc1_percentile']
-    wv6 = Wave6.grouped_by_country_pca['pc1_percentile']
-    US = pd.Series([wv2[840],wv3[840],wv4[840],wv5[840]])
-    Chile = pd.Series([wv2[152],wv3[152],wv4[152],wv5[152]])
-    Russia = pd.Series([wv2[643],wv3[643],wv5[643]])
-    US_x = [1994,1998,2004,2009]
-    chile_x = [1994,1998,2004,2009]
-    russia_x = [1994,1998,2009]
-
-    plot1, = plt.plot(US_x,US)
-    plot2, = plt.plot(chile_x,Chile)
-    plot3, = plt.plot(russia_x,Russia)
-    plt.legend([plot1,plot2,plot3],["US", "Chile",'Russia'])
-    #plt.xlabel('Year')
-    #plt.ylabel('Percentile of liberal social values/secularism component')
-    plt.show()
-
-
-
-
-
-
-
 class Entire_Survey():
     #reads in WVS and EVS surveys; concatenates them together
     def __init__(self,autofit = True):
@@ -179,7 +151,8 @@ class Wave():
         self.most_important_cols_pca()
         self.survey_question_and_PC = pd.concat((self.survey_scaled,self.survey_in_PC_space), axis = 1)
 
-
+    #function that performs NMF on the cleaned survey data, and initializes a number of class attributes
+    #that describe this transformation
     def nmf_transform(self,num_components):
         self.nmf = NMF(n_components = num_components)
         self.survey_in_NMF_space = pd.DataFrame(self.nmf.fit_transform(self.survey_scaled))
@@ -193,8 +166,8 @@ class Wave():
         self.survey_question_and_NMF = pd.concat((self.survey_scaled,self.survey_in_NMF_space), axis = 1)
 
 
-    # function that outputs all columns used in the PCA analysis, in order of highest correlation with
-    #principal component 1
+    # function that initializes variables that describe the makeup of each principal component in terms of the
+    # original survey questions
     def most_important_cols_pca(self):
         cols = self.v_matrix.columns
         self.component_dic_pca = {}
@@ -218,6 +191,8 @@ class Wave():
             feature_correlations = self.correlation_matrix_pca.loc[i,features]
             self.correlation_dic_pca[i] = pd.Series(index = features,data = feature_correlations)
 
+    # function that initializes variables that describe the makeup of each NMF topic in terms of the
+    # original survey questions
     def most_important_cols_nmf(self):
         cols = self.h_matrix.columns
         self.component_dic_nmf = {}
@@ -248,47 +223,31 @@ class Wave():
         self.grouped_by_country_pca = self.survey_question_and_PC.groupby('country').mean()
         self.grouped_by_country_nmf = self.survey_question_and_NMF.groupby('country').mean()
 
-    def normalize_pca_components(self):
-        self.by_country_normalized = pd.DataFrame(normalize(self.grouped_by_country_pca.iloc[:,range(1,16)].copy()))
-        self.by_country_normalized.index = self.grouped_by_country_pca.index
-
+    # function that calculates euclidean distances of countries from one another based on per-country average
+    # survey responses
     def calculate_country_distances(self):
         length = self.grouped_by_country_pca.shape[1]
-        self.country_distances = pd.DataFrame(euclidean_distances(self.grouped_by_country_pca.iloc[:,range(1,4)]))
-        self.country_distances.index = self.by_country_normalized.index
-        self.country_distances.columns = self.by_country_normalized.index
         self.country_distances = pd.DataFrame(euclidean_distances(self.grouped_by_country_pca.iloc[:,:length/2]))
-        self.country_distances.index = self.by_country_normalized.index
-        self.country_distances.columns =  self.by_country_normalized.index
-    # this method calls all the necessary functions to create the final cleaned version of the wave
-    # file, rather than calling them each individually
+        self.country_distances.index = self.grouped_by_country_pca.index
+        self.country_distances.columns =  self.grouped_by_country_pca.index
 
-    def fit(self):
-        self.output_selected_questions(.7)
-        self.drop_na()
-        self.min_max_scale_questions()
-        self.pca_transform()
-        self.nmf_transform(4)
-        self.group_by_country()
-        self.normalize_pca_components()
-        self.calculate_country_distances()
-        self.pickle_correlation_dic()
-        self.kmeans(7)
-        self.calculate_percentiles()
-
+    # function that prints the questions most correlated with a particular principal component
     def return_principal_component_questions(self,num_components,correlation_threshold):
-        for component_number in xrange(1,num_components):
+        for component_number in xrange(1,num_components + 1):
             component = self.correlation_dic_pca[component_number]
             print component[np.abs(component)>correlation_threshold]
-
+    # function that prints the questions most correlated with a particular NMF topic
     def return_nmf_questions(self,num_components,correlation_threshold):
-        for component_number in xrange(1,num_components):
+        for component_number in xrange(1,num_components + 1):
             component = self.correlation_dic_nmf[component_number]
             print component[np.abs(component)>correlation_threshold]
 
+    # function that calculates the percentile of a country's values for the first principal component relative to
+    # the other countries
     def calculate_percentiles(self):
         self.grouped_by_country_pca['pc1_percentile'] = [percentileofscore(-self.grouped_by_country_pca[1],-i) for i in self.grouped_by_country_pca[1]]
 
+    # function that performs k means clustering on the first 4 principal components
     def kmeans(self,cluster_number):
         self.k_means = []
         self.labels = []
@@ -300,38 +259,42 @@ class Wave():
             self.labels.append(labels)
         self.grouped_by_country_pca['labels'] = self.labels[2]
 
+    # function that shows a graph of inertia versus cluster number to be used to determine that optimal cluster number
     def k_means_graph(self):
         inertias = [cluster.inertia_ for cluster in self.k_means]
         plt.plot(xrange(1,len(self.k_means) + 1),inertias)
         plt.show()
 
+    # function that pickles the PCA component - survey question correlation dictionaries to be used with the
+    # flask web app
     def pickle_correlation_dic(self):
         with open('pickled_correlation_dictionaries/Wave' + str(self.wave_number) + '_correlation_dic.pkl','w') as f:
             pickle.dump(self.correlation_dic_pca,f)
 
 
-
+    # function that outputs node and edge files in csv format for use with Gephi; only produces edges between
+    # countries whose distance between surveys is less than 6
     def output_graph_data(self,cluster_number):
-        test = []
+        edges = []
         counter = 0
         for source in self.country_distances.columns:
             for target in self.country_distances.index:
                 if self.country_distances.loc[source,target] <6 and source!=target:
-                    test_sub = []
+                    edges_row = []
                     similarity = 1./self.country_distances.loc[source,target]
-                    test_sub.append(source)
-                    test_sub.append(target)
-                    test_sub.append('Undirected')
-                    test_sub.append(counter)
-                    test_sub.append(similarity)
-                    test_sub.append(1)
+                    edges_row.append(source)
+                    edges_row.append(target)
+                    edges_row.append('Undirected')
+                    edges_row.append(counter)
+                    edges_row.append(similarity)
+                    edges_row.append(1)
                     counter+=1
-                    test.append(test_sub)
+                    edges.append(edges_row)
+        edges = np.array(edges)
+        edges_out = pd.DataFrame(edges)
+        edges_out.columns = ['Source','Target','Type', 'Id', 'Weight', 'Average Degree']
+        edges_out.to_csv('Gephi_Files/Wave' + str(self.wave_number) + 'edges.csv')
 
-        test = np.array(test)
-        test_out = pd.DataFrame(test)
-        test_out.columns = ['Source','Target','Type', 'Id', 'Weight', 'Average Degree']
-        test_out.to_csv('Gephi_Files/Wave' + str(self.wave_number) + 'edges.csv')
         nodes_out = pd.DataFrame(self.country_distances.index)
         nodes_out.columns = ['Id']
         nodes_out['Label'] = nodes_out['Id'].replace(country_dictionary)
@@ -340,9 +303,52 @@ class Wave():
         nodes_out.to_csv('Gephi_Files/Wave' + str(self.wave_number) + 'nodes.csv')
 
 
+    # this method calls all the necessary functions to create the final cleaned version of the wave
+    # file, rather than calling them each individually
+    def fit(self):
+        self.output_selected_questions(.7)
+        self.drop_na()
+        self.min_max_scale_questions()
+        self.pca_transform()
+        self.nmf_transform(4)
+        self.group_by_country()
+        self.calculate_country_distances()
+        self.pickle_correlation_dic()
+        self.kmeans(7)
+        self.calculate_percentiles()
+
+
+
+# function that plots the change over time in the first principal component for the US, Russia, and Chile
+def plot_change():
+    wv1 = Wave1.grouped_by_country_pca['pc1_percentile']
+    wv2 = Wave2.grouped_by_country_pca['pc1_percentile']
+    wv3 = Wave3.grouped_by_country_pca['pc1_percentile']
+    wv4 = Wave4.grouped_by_country_pca['pc1_percentile']
+    wv5 = Wave5.grouped_by_country_pca['pc1_percentile']
+    wv6 = Wave6.grouped_by_country_pca['pc1_percentile']
+
+    US = pd.Series([wv2[840],wv3[840],wv4[840],wv5[840]])
+    Chile = pd.Series([wv2[152],wv3[152],wv4[152],wv5[152]])
+    Russia = pd.Series([wv2[643],wv3[643],wv5[643]])
+    US_x = [1994,1998,2004,2009]
+    Chile_x = [1994,1998,2004,2009]
+    Russia_x = [1994,1998,2009]
+
+    plot1, = plt.plot(US_x,US)
+    plot2, = plt.plot(Chile_x,Chile)
+    plot3, = plt.plot(Russia_x,Russia)
+    plt.legend([plot1,plot2,plot3],["US", "Chile",'Russia'])
+    plt.xlabel('Year')
+    plt.ylabel('Percentile of liberal social values/secularism component')
+    plt.show()
+
+
 
 if __name__ == '__main__':
+    # create main survey
     survey = Entire_Survey()
+    # stratify by time period
     Wave1 = Wave(1,survey.survey_cleaned)
     Wave2 = Wave(2,survey.survey_cleaned)
     Wave3 = Wave(3,survey.survey_cleaned)
@@ -350,4 +356,7 @@ if __name__ == '__main__':
     Wave5 = Wave(5,survey.survey_cleaned)
     Wave6 = Wave(6,survey.survey_cleaned)
     wave_list = [Wave1, Wave2, Wave3, Wave4, Wave5, Wave6]
-    #plot_all_graphs(wave_list)
+    # create plotly choropleth maps of first three principal components for each time period
+    plot_all_graphs(wave_list)
+    # chart changes over time for first principal component in US, Russia, and Chile
+    plot_change()

@@ -1,4 +1,4 @@
-
+# to be commented on after presentation
 
 with open('country_codes.txt','r') as f:
     countries = []

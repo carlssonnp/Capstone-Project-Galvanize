@@ -1,3 +1,5 @@
+# will clean and comment following presentation
+
 import plotly.plotly as py
 import pandas as pd
 from country_dictionary import country_dictionary

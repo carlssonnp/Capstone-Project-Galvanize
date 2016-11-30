@@ -1,3 +1,5 @@
+
+## to be cleaned and commented following presentation
 from flask import Flask, request
 app = Flask(__name__)
 from analyze_surveys import Wave
@@ -7,10 +9,6 @@ import pickle
 import pandas as pd
 
 
-# home page
-# @app.route('/')
-# def index():
-#     return '<a href="https://plot.ly/~nordik91/20.embed">look at the graph</a>'
 @app.route('/')
 def index():
     return 'hi'

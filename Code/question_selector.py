@@ -1,3 +1,5 @@
+# will be cleaned and commented following presentation
+
 # the following functions, create_columns_a - create_columns_i, determine what questions to use from each section
 def create_columns_a(num_vars):
     col_nums = xrange(1,num_vars + 1)
