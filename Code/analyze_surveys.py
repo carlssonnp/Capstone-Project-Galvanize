@@ -13,8 +13,15 @@ import matplotlib.pyplot as plt
 
 
 class Entire_Survey():
-    #reads in WVS and EVS surveys; concatenates them together
+    '''
+    Class that contains the data for the 1981-2014 World and European Values Surveys. Creates DataFrame where each row is an individual, and the columns are questions from the survey.
+    '''
     def __init__(self,autofit = True):
+        '''
+        INPUT:  Bool - whether or not to perform data cleaning upon loading of surveys
+
+        Reads in WVS and EVS surveys; concatenates them together. Performs data cleaning if autofit is True.
+        '''
         self.WVS_filename = '../WVS/Original_CSV_Files/integrated/longitudinal.csv'
         self.EVS_filename = '../EVS/ZA4804_v3-0-0.dta'
         self.WVS = pd.read_csv(self.WVS_filename).drop('Unnamed: 0', axis = 1)
@@ -25,62 +32,100 @@ class Entire_Survey():
         if autofit:
             self.fit()
 
-    # method that fills in the wave number for the EVS surveys; they only have EVS wave number, which is not
-    # consistent chronologically with WVS wave number
+
     def fill_EVS_wave(self):
+        '''
+        Method that fills in the wave number for the EVS surveys; in the original data, they only have EVS wave number, which is not consistent chronologically with WVS wave number
+        '''
         dic = {3:4, 4:5}
         self.EVS['S002'] = self.EVS['S002EVS'].replace(dic)
 
-    #combines WVS and EVS surveys
     def combine_surveys(self):
+        '''
+        Method that concatenates the World and European Surveys together.
+        '''
         self.survey = pd.concat((self.WVS, self.EVS))
         self.survey.reset_index(inplace = True)
         self.survey.drop('index', axis = 1, inplace = True )
 
-    # chooses all questions from survey that are answered on a continous scale (i.e. 1-10, 1-4)
     def choose_columns_total(self):
-            self.create_columns_a()
-            self.create_columns_b()
-            self.create_columns_c()
-            self.create_columns_d()
-            self.create_columns_e()
-            self.create_columns_f()
-            self.create_columns_g()
-            self.create_columns_h()
-            self.create_columns_i()
+        '''
+        Chooses all questions from survey that are answered on a continous scale (i.e. 1-10, 1-4). Creates a DataFrame from 'survey' by including only these questions.
+        '''
+        self.create_columns_a()
+        self.create_columns_b()
+        self.create_columns_c()
+        self.create_columns_d()
+        self.create_columns_e()
+        self.create_columns_f()
+        self.create_columns_g()
+        self.create_columns_h()
+        self.create_columns_i()
 
-            #add in the identifying columns: S003 (country), S002 (wave number), S020 (year of survey)
-            self.columns +=  ['S003'] + ['S002'] + ['S020']
-            self.survey_chosen_columns = self.survey[self.columns].copy()
+        #add in the identifying columns: S003 (country), S002 (wave number), S020 (year of survey)
+        self.columns +=  ['S003'] + ['S002'] + ['S020']
+        self.survey_chosen_columns = self.survey[self.columns].copy()
 
-    # the following functions, create_columns_a - create_columns_i, determine what questions to use from each section
+    # The following functions, create_columns_a - create_columns_i, determine what questions to use from each section
+
     def create_columns_a(self,num_vars = 222):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_a(num_vars))
     def create_columns_b(self,num_vars = 23):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_b(num_vars))
     def create_columns_c(self,num_vars = 64):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_c(num_vars))
     def create_columns_d(self,num_vars = 80):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_d(num_vars))
     def create_columns_e(self,num_vars = 267):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_e(num_vars))
     def create_columns_f(self,num_vars = 205):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_f(num_vars))
     def create_columns_g(self,num_vars = 51):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_g(num_vars))
     def create_columns_h(self):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_h())
     def create_columns_i(self):
+        '''
+        INPUT: Int - number of variables to choose from section
+        '''
         self.columns.extend(question_selector.create_columns_i())
 
-    #this method changes all answers with negative values to NAN, as these are questions that were not answered.
     def change_negative_to_nan(self):
+        '''
+        Changes all answers with negative values to NAN, as these are questions that were not answered. Creates a new DataFrame from 'survey_cleaned' to reflect this.
+        '''
         self.survey_cleaned = self.survey_chosen_columns.copy()
         for column in self.survey_cleaned:
             self.survey_cleaned[column] = self.survey_cleaned[column].apply(lambda x: x if x>=0 else np.nan)
-    # this method calls all the necessary functions to create the final cleaned version of the combined EVS and WVS
-    # file, rather than calling them each individually
+
     def fit(self):
+        '''
+        Calls necessary functions to create the final cleaned DataFrame of the combined EVS and WVS file, with columns corresponding to the selected questions
+        '''
         self.choose_columns_total()
         self.change_negative_to_nan()
 
@@ -92,45 +137,66 @@ class Entire_Survey():
 
 
 class Wave():
-    #initializes wave class, containing the data for one wave
+    '''
+    Class that contains the data for one particular time period of the survey. Creates DataFrame where each row is an individual, and the columns are questions from the survey. Also contains methods for dimensionality reduction to understand main drivers of variance in each time period.
+    '''
+
     def __init__(self,wave_number,df_total,autofit = True):
+        '''
+        INPUT: INT - Time period with which to construct wave
+               DATAFRAME - entire survey: World and European Values Surveys concatenated together
+               BOOLEAN - whether or not to perform data cleaning and analysis upon instantiation of class
+
+        Creates DataFrames corresponding to observations in the selected time period.
+        '''
         self.wave_number = wave_number
         self.group_by_wave(df_total)
         if autofit:
             self.fit()
 
-    # function that keeps only the observations that are part of the specified wave
-    def group_by_wave(self,df_in):
-        self.survey = df_in[df_in['S002'] == self.wave_number].copy()
+    def group_by_wave(self,df_total):
+        '''
+        Creates DataFrame from input survey by filtering out any observations that are not in the specified time period.
+        '''
+        self.survey = df_total[df_total['S002'] == self.wave_number].copy()
 
 
-    # function that sorts the output columns of the 'keep_answered' function and removes columns for wave number,
-    #country, and year, since these columns represent identifying variables and should not be used in the PCA
-    #analysis
+
     def output_selected_questions(self,threshold):
+        '''
+        INPUT: FLOAT - minimum percent of question reponses that must not be NAN
+
+        Calls 'keep_mostly_answered' function to only include survey questions that have percentage answered above the threshold value. Creates DataFrame from 'self.survey' by including only these questions.
+        '''
         selected_questions =self.keep_mostly_answered(threshold)
         self.survey_selected_questions = self.survey[selected_questions].copy()
 
-    # function that determines which columns to keep, based on an input threshold that represents minimum percent
-    # of data that must not be missing
     def keep_mostly_answered(self,threshold):
+        '''
+        INPUT: FLOAT - minimum percent of question reponses that must not be NAN
+
+        OUTPUT: LIST - a list of survey questions that have percentage answered above the threshold value
+        '''
         question_percentage_answered = (self.survey.count()/self.survey.shape[0]).to_dict()
         mostly_answered = [key for key,value in question_percentage_answered.iteritems() if value > threshold]
         return sorted(mostly_answered)
 
-
-    #function that drops any row with an NAN value; will look into better ways to deal with missing values later
     def drop_na(self):
+        '''
+        Creates DataFrame from 'survey_selected_questions' by dropping any row with an NAN value
+        '''
         self.survey_delete_na = self.survey_selected_questions.dropna(axis = 0)
 
 
-    # function that min_max scales each feature/question to be in the range of 1-10. Since some of the questions are on
-    #a scale of 1-4, others range from 1-10, this could cause a problem with PCA since the method will likely pick up on
-    #the 1-10 questions more than the 1-4 questions (the former will likely have higher variance). Also note that
-    # I leave the identifying survey questions (country, year, wave) out, since these are not features I wish to
-    # transform
+
     def min_max_scale_questions(self):
+        '''
+        Function that min_max scales each feature/question to be in the range of 1-10. Since some of the questions are on a scale of 1-4, others range from 1-10, this could cause a problem with PCA since the method will likely pick up on the 1-10 questions more than the 1-4 questions (the former will likely have higher variance). Also note that I leave the identifying survey questions (country, year, wave) out, since these are not features I wish to transform.
+
+        A new DataFrame is created from 'survey_delete_na' to reflect this scaling.
+        '''
         scaler = MinMaxScaler(feature_range = (1,10))
+        # scale up until the last 3 columns, which are identifying features and should not be transformed/included in the dimensionality reduction
         self.survey_scaled = pd.DataFrame(scaler.fit_transform(self.survey_delete_na.iloc[:,:-3]))
         self.survey_scaled.columns = self.survey_delete_na.columns[:-3]
 
@@ -138,17 +204,28 @@ class Wave():
     #function that performs PCA on the cleaned survey data, and initializes a number of class attributes
     #that describe this transformation
     def pca_transform(self):
+        '''
+        Performs PCA on the cleaned survey data, and initializes class attributes to describe this transformation
+        '''
+        #sklearn pca object
         self.pca = PCA()
+        #transformed data
         self.survey_in_PC_space = pd.DataFrame(self.pca.fit_transform(self.survey_scaled))
         self.survey_in_PC_space.columns = range(1,self.survey_in_PC_space.shape[1] + 1)
         self.survey_in_PC_space['country'] = self.survey_delete_na['S003'].copy().values
 
+        # initializes V matrix, describing principal components as linear combinations of original survey questions. #Each row is a principal component, and each column is a survey question
         self.v_matrix = pd.DataFrame(self.pca.components_)
         self.v_matrix.columns = self.survey_scaled.columns
         self.v_matrix.index = range(1,self.v_matrix.shape[0] + 1)
-        self.explained_variance = self.pca.explained_variance_
 
+        # contains explained_variance_ratio
+        self.explained_variance_ratio = self.pca.explained_variance_ratio_
+
+        # calls helper function to create dictionaries that hold information about the PCA transformation
         self.most_important_cols_pca()
+
+        # creates DataFrame to contain both original question answers and principal component values for each respondent
         self.survey_question_and_PC = pd.concat((self.survey_scaled,self.survey_in_PC_space), axis = 1)
 
     #function that performs NMF on the cleaned survey data, and initializes a number of class attributes
@@ -169,27 +246,38 @@ class Wave():
     # function that initializes variables that describe the makeup of each principal component in terms of the
     # original survey questions
     def most_important_cols_pca(self):
+        '''
+        Creates class atrributes that describe the makeup of the principal components in terms of the original survey questions.
+        '''
         cols = self.v_matrix.columns
-        self.component_dic_pca = {}
-        self.correlation_matrix_pca = self.v_matrix.copy()
-        self.correlation_dic_pca ={}
 
+        #dictionary that contains principal component numbers as keys, and pandas Series containing the survey questions associated with that component in order of their association with that component
+        self.component_dic_pca = {}
         for i in xrange(1,self.v_matrix.shape[0] + 1):
             feature_indices = np.argsort(np.abs(self.v_matrix.loc[i,:]))[::-1]
             features = cols[feature_indices]
             feature_values = self.v_matrix.loc[i,features]
             self.component_dic_pca[i] = pd.Series(index = features,data = feature_values)
 
+        # matrix that contains correlations of questions with each principal component. The rows represent principal components, the columns represent survey questions .
+        self.correlation_matrix_pca = self.v_matrix.copy()
         for column in self.survey_in_PC_space.columns[:-1]:
             for feature in self.survey_scaled:
                 corr = pearsonr(self.survey_in_PC_space[column],self.survey_scaled[feature])
                 self.correlation_matrix_pca.loc[column,feature] = corr[0]
 
+        #dictionary that contains principal component numbers as keys, and pandas Series containing the survey questions associated with that component in order of their correlation with that component
+        self.correlation_dic_pca ={}
         for i in xrange(1,self.correlation_matrix_pca.shape[0] + 1):
             feature_indices = np.argsort(np.abs(self.correlation_matrix_pca.loc[i,:]))[::-1]
             features = cols[feature_indices]
             feature_correlations = self.correlation_matrix_pca.loc[i,features]
             self.correlation_dic_pca[i] = pd.Series(index = features,data = feature_correlations)
+
+
+
+
+
 
     # function that initializes variables that describe the makeup of each NMF topic in terms of the
     # original survey questions
@@ -220,19 +308,32 @@ class Wave():
     # function that groups suvey questions and derived features (PCA and NMF) by country and takes the mean of these
     #columns
     def group_by_country(self):
+        '''
+        Groups both survey answers and derived features (PCA and NMF) by country, takes means
+        '''
         self.grouped_by_country_pca = self.survey_question_and_PC.groupby('country').mean()
         self.grouped_by_country_nmf = self.survey_question_and_NMF.groupby('country').mean()
 
     # function that calculates euclidean distances of countries from one another based on per-country average
     # survey responses
     def calculate_country_distances(self):
+        '''
+        Clculates euclidean distances of countries from one another based on per-country average survey responses
+        '''
         length = self.grouped_by_country_pca.shape[1]
+        # calculate distances based on first length/2 columns, since those columns contain answers to the original survey questions
         self.country_distances = pd.DataFrame(euclidean_distances(self.grouped_by_country_pca.iloc[:,:length/2]))
         self.country_distances.index = self.grouped_by_country_pca.index
         self.country_distances.columns =  self.grouped_by_country_pca.index
 
     # function that prints the questions most correlated with a particular principal component
     def return_principal_component_questions(self,num_components,correlation_threshold):
+        '''
+        INPUT: INT - number of principal components to print out
+               FLOAT - threshold above which correlations must be in order to be printed
+
+        Prints out questions most correlated with principal components.
+        '''
         for component_number in xrange(1,num_components + 1):
             component = self.correlation_dic_pca[component_number]
             print component[np.abs(component)>correlation_threshold]
