@@ -1,10 +1,5 @@
-to do:
-implement weighted pca  
-fill missing data
-make graph of country connections
-deal with binary variables
 
-these are the first principal components for each survey wave
+These are the first principal components for each survey wave
 
 1.
 Higher means more social acceptance and less religious

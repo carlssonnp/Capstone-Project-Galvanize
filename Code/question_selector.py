@@ -2,6 +2,13 @@
 # The following functions, create_columns_a - create_columns_i, determine what questions to use from each section
 
 def create_columns_a(num_vars):
+    '''
+    INPUT: INT - number of questions to choose
+
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category a
+    '''
     col_nums = xrange(1,num_vars + 1)
     columns = []
     for col_num in col_nums:
@@ -27,6 +34,13 @@ def create_columns_a(num_vars):
 
 
 def create_columns_b(num_vars):
+    '''
+    INPUT: INT - number of questions to choose
+
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category b
+    '''
     col_nums = xrange(1,num_vars + 1)
     columns = []
     for col_num in col_nums:
@@ -47,6 +61,13 @@ def create_columns_b(num_vars):
 
 
 def create_columns_c(num_vars):
+    '''
+    INPUT: INT - number of questions to choose
+
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category c
+    '''
     col_nums = xrange(1,num_vars + 1)
     columns = []
     for col_num in col_nums:
@@ -67,6 +88,13 @@ def create_columns_c(num_vars):
 
 
 def create_columns_d(num_vars):
+    '''
+    INPUT: INT - number of questions to choose
+
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category d
+    '''
     col_nums = xrange(1,num_vars + 1)
     columns = []
     for col_num in col_nums:
@@ -87,6 +115,13 @@ def create_columns_d(num_vars):
 
 
 def create_columns_e(num_vars):
+    '''
+    INPUT: INT - number of questions to choose
+
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category e
+    '''
     col_nums = xrange(1,num_vars + 1)
     columns = []
     for col_num in col_nums:
@@ -131,6 +166,13 @@ def create_columns_e(num_vars):
 
 
 def create_columns_f(num_vars):
+    '''
+    INPUT: INT - number of questions to choose
+
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category f
+    '''
     col_nums = xrange(1,num_vars + 1)
     columns = []
     for col_num in col_nums:
@@ -163,6 +205,13 @@ def create_columns_f(num_vars):
 
 
 def create_columns_g(num_vars):
+    '''
+    INPUT: INT - number of questions to choose
+
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category g
+    '''
     col_nums = xrange(1,num_vars + 1)
     columns = []
     for col_num in col_nums:
@@ -186,8 +235,18 @@ def create_columns_g(num_vars):
 
 
 def create_columns_h():
+    '''
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category h
+    '''
     return ['H001']
 
 
 def create_columns_i():
+    '''
+    OUTPUT: LIST - list of questions chosen
+
+    Creates list of questions from category i
+    '''
     return ['I001', 'I002']
