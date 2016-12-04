@@ -7,7 +7,7 @@ from scipy.stats import pearsonr, percentileofscore
 from plotly_choropleth import plot_choropleth, plot_all_graphs
 import question_selector
 from sklearn.cluster import KMeans
-from country_dictionary import country_dictionary
+from country_dictionary import return_country_dictionary
 import pickle
 import matplotlib.pyplot as plt
 
@@ -433,8 +433,7 @@ class Wave():
 
         nodes_out = pd.DataFrame(self.country_distances.index)
         nodes_out.columns = ['Id']
-        nodes_out['Label'] = nodes_out['Id'].replace(country_dictionary)
-        nodes_out['Label'] = nodes_out['Label'].replace({499:'Montenegro', 688: 'Serbia'})
+        nodes_out['Label'] = nodes_out['Id'].replace(return_country_dictionary())
         nodes_out['Kmeans'] = self.labels[cluster_number - 1]
         nodes_out.to_csv('Gephi_Files/Wave' + str(self.wave_number) + 'nodes.csv')
         self.nodes_out = nodes_out
@@ -487,6 +486,7 @@ def plot_change():
 if __name__ == '__main__':
     # create main survey
     survey = Entire_Survey()
+
     # stratify by time period
     Wave1 = Wave(1,survey.survey_cleaned)
     Wave2 = Wave(2,survey.survey_cleaned)
@@ -495,7 +495,9 @@ if __name__ == '__main__':
     Wave5 = Wave(5,survey.survey_cleaned)
     Wave6 = Wave(6,survey.survey_cleaned)
     wave_list = [Wave1, Wave2, Wave3, Wave4, Wave5, Wave6]
+
     # create plotly choropleth maps of first three principal components for each time period
     #plot_all_graphs(wave_list)
+
     # chart changes over time for first principal component in US, Russia, and Chile
     plot_change()

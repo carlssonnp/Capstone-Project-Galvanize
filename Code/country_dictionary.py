@@ -1,16 +1,15 @@
-# to be commented on after presentation
+def return_country_dictionary():
+     '''
+     OUTPUT: dictionary with country codes as keys and country names as values
 
-with open('country_codes.txt','r') as f:
-    countries = []
-    countries = f.read().split('\r')
+     Creates a dictionary mapping country codes (numeric) to country names (values)
+     '''
+     with open('country_codes.txt','r') as f:
+         countries = f.read().split('\r')
 
-    countries_id_to_name = []
-    for country in countries[:-6]:
-        id_name_split = country.split('##')
-        countries_id_to_name.append(id_name_split)
+         #The last six lines of the country name file are not countries
+         countries_id_to_name = [country.split('##') for country in countries[:-6]]
 
-    country_dictionary = {}
-    for country in countries_id_to_name:
-        country_dictionary[country[0]] = country[1]
+         country_dictionary = {int(country[0]): country[1] for country in countries_id_to_name}
 
-    country_dictionary = {int(key): item for key, item in country_dictionary.iteritems() }
+         return country_dictionary
