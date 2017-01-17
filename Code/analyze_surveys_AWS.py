@@ -4,13 +4,12 @@ from sklearn.decomposition import PCA,NMF
 from sklearn.preprocessing import MinMaxScaler, normalize
 from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 from scipy.stats import pearsonr, percentileofscore
-from plotly_choropleth import plot_choropleth, plot_all_graphs
 import question_selector
 from sklearn.cluster import KMeans
 from country_dictionary import return_country_dictionary
 import pickle
-import matplotlib.pyplot as plt
 from time import time
+
 
 
 class Entire_Survey():
@@ -23,8 +22,8 @@ class Entire_Survey():
 
         Reads in WVS and EVS surveys; concatenates them together. Performs data cleaning if autofit is True.
         '''
-        self.WVS_filename = '../WVS/Original_CSV_Files/integrated/longitudinal.csv'
-        self.EVS_filename = '../EVS/ZA4804_v3-0-0.dta'
+        self.WVS_filename = 'https://s3.amazonaws.com/capstonebucket/longitudinal.csv'
+        self.EVS_filename = 'https://s3.amazonaws.com/capstonebucket/ZA4804_v3-0-0.dta'
         self.WVS = pd.read_csv(self.WVS_filename).drop('Unnamed: 0', axis = 1)
         self.EVS = pd.read_stata(self.EVS_filename, convert_categoricals = False)
         self.fill_EVS_wave()
@@ -485,8 +484,8 @@ def plot_change():
 
 
 if __name__ == '__main__':
+    t1 = time()
     # create main survey
-    t0 = time()
     survey = Entire_Survey()
 
     # stratify by time period
@@ -497,11 +496,11 @@ if __name__ == '__main__':
     Wave5 = Wave(5,survey.survey_cleaned)
     Wave6 = Wave(6,survey.survey_cleaned)
     wave_list = [Wave1, Wave2, Wave3, Wave4, Wave5, Wave6]
-    t1 = time()
-    print t1- t0
+    t2 = time()
+    print t2 - t1
 
     # create plotly choropleth maps of first three principal components for each time period
     #plot_all_graphs(wave_list)
 
     # chart changes over time for first principal component in US, Russia, and Chile
-    plot_change()
+    #plot_change()
