@@ -51,7 +51,7 @@ There was a substantial amount of missing data in the survey, as is often the ca
 
 To deal with 3., I decided to perform my analyses for each wave separately. For 1. and 2., I think matrix factorization holds great promise (similar to filling in missing ratings in a user-ratings matrix for a recommender system), or using a K-nearest neighbors missing data imputation algorithm. Due to the short time frame of this project, I left this as a future step to take.
 
-Since PCA does not work with missing values, in each time period I only included time
+Since PCA does not work with missing values, in each time period I only included questions that were responded to by over 70% of the population in that time period. Any individuals with missing values were then dropped from the analysis.
 
 # Choice of topic analysis method
 The two methods of topic extraction that I considered were PCA and Non-negative Matrix Factorization (NMF). I opted to use PCA because it would decompose the surveys into topics that capture in decreasing order the variance in the data. This would make it easy for me to see which topics were most divisive, i.e. what topics were drivers of variance in societal attitudes. NFM also extracts topics but is not based on this premise of variance explanation.
@@ -108,6 +108,6 @@ I also thought it would be interesting to take a look at how individual countrie
 
 If I could sum it all up in one sentence: religion has been, and continues to be, an extremely divisive topic! Attitudes differ markedly according to geographical region, with Western Europe generally being the least religious/most socially liberal, and African nations having the strongest levels of religion and social conservatism.
 
-Future work includes investigating principal components beyond the 1st, and also including non-ordinal categorical and binary survey questions. I will also be putting my visualization app online in the near future.
+Future work includes investigating principal components beyond the 1st, and also including non-ordinal categorical and binary survey questions. I will also be putting my visualization app online in the near future. Finally, I would like to develop an intelligent method for imputing missing data, perhaps via K-Nearest Neighbors or using a matrix factorization method, similar to those used in recommender systems.
 
 Thanks for following along, I hope you learned something! Feel free to contact me at carlssonnp@gmail.com with any questions.  
