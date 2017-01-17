@@ -36,6 +36,7 @@ The World Values Survey (WVS) has been administered with more frequency than the
 
 # Question Selection
 I now had a pandas DataFrame that contained answers to hundreds of questions from over 100 countries. The questions were of three main types:
+
 1. ordinal categorical (Question A006 - Important in Life: religion [1: Very Important, 4: Not at all important])
 2. non-ordinal categorical (Question E001 - Aims of country: 1. High level of economic growth, 2. Strong defense forces, 3. People have more say about how things are done, 4. Trying to make our cities and countryside more beautiful)
 3. binary (Question A016 - Ever felt on top of the world: 0. No, 1. Yes ).
