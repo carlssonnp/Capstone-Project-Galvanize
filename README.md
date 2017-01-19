@@ -30,7 +30,7 @@ Presentation Materials: a keynote presentation of my results, as well as the ass
 # Analysis Walkthrough
 
 # Data Cleaning
-The first step in the process was to download the data files from the World Values homepage and the European Values homepage, respectively. These data is offered both in time period-specific format (i.e., only the data from one particular time period/wave of the survey) and in an aggregated format. The issue with using the time period-specific format is that every wave of the survey has slightly different questions and/or question labels, so comparing different time periods can be a mess. Fortunately, the aggregated format takes care of this by grouping similar questions together under the umbrella of one question, so this is the format I chose to work with.
+The first step in the process was to download the data files from the World Values homepage and the European Values homepage, respectively. This data is offered both in time period-specific format (i.e., only the data from one particular time period/wave of the survey) and in an aggregated format. The issue with using the time period-specific format is that every wave of the survey has slightly different questions and/or question labels, so comparing different time periods can be a mess. Fortunately, the aggregated format takes care of this by grouping similar questions together under the umbrella of one question, so this is the format I chose to work with.
 
 The World Values Survey (WVS) has been administered with more frequency than the European Values Survey (EVS), meaning there is not a one-to-one correspondence between time periods covered by the WVS and EVS. So I manually matched the time periods of the EVS to the time periods of the WVS that best corresponded to one another. After this was done, the surveys were ready to be merged: I appended the EVS to the WVS, and the data was ready.
 
@@ -38,7 +38,7 @@ The World Values Survey (WVS) has been administered with more frequency than the
 I now had a pandas DataFrame that contained answers to hundreds of questions from over 100 countries. The questions were of three main types:
 
 1. ordinal categorical (Question A006 - Important in Life: religion [1: Very Important, 4: Not at all important])
-2. non-ordinal categorical (Question E001 - Aims of country: 1. High level of economic growth, 2. Strong defense forces, 3. People have more say about how things are done, 4. Trying to make our cities and countryside more beautiful)
+2. non-ordinal categorical (Question E001 - Aims of country: 1: High level of economic growth, 2: Strong defense forces, 3: People have more say about how things are done, 4: Trying to make our cities and countryside more beautiful)
 3. binary (Question A016 - Ever felt on top of the world: 0. No, 1. Yes ).
 
 Principal component analysis is really designed to work with continuous variables, as comparing variance between continuous and categorical variables can be tricky. So for my first pass at this project I restricted the questions to those that were ordinal categorical, and treated them as continuous.
@@ -66,7 +66,11 @@ To get a feel for how my analysis would proceed, I chose a small subset of quest
 This posed a problem for my analysis because the questions with larger ranges of answers would likely have higher variance than the questions with smaller ranges, meaning that PCA analysis would pick up on those questions with higher ranges. To deal with this, I min-maxed scaled each survey question, so that the range would be the same. I used this type of scaling rather than standardizing the data because the min-max method still allows each feature to have a unique variance, whereas standardizing the features would lead to unit variance across the board, taking away from my ability to discern overall variance in the data.
 
 # PCA results
-After performing PCA, I found that in each time period, the first principal component was always most correlated with questions that quantified two subjects: i. religion (questions that quantified importance of religion, regular attendance in church, etc. ), and ii. social conservatism (questions that quantified attitudes towards homosexuality, abortion, divorce ,etc. ). It was not entirely surprising to me that these two topics went hand in hand, as religion is often associated with conservative social views. I found it noteworthy, though, that the theme represented by the first principal was so consistent across time: these results suggest that the single most divisive topic in human attitudes across a time span ranging from 1981 through 2014 is a combination of religious views and the social conservatism that often accompanies it! I have laid out the questions most associated with the first principal component for each time period below.
+After performing PCA, I found that in each time period, the first principal component was always most correlated with questions that quantified two subjects: 
+
+1. Religion (questions that quantified importance of religion, regular attendance in church, etc. )
+
+2. Social conservatism (questions that quantified attitudes towards homosexuality, abortion, divorce, etc. ). It was not entirely surprising to me that these two topics went hand-in-hand, as religion is often associated with conservative social views. I found it noteworthy, though, that the theme represented by the first principal component was so consistent across time: these results suggest that the single most divisive topic in human attitudes across a time span ranging from 1981 through 2014 is a combination of religious views and the social conservatism that often accompanies it! I have laid out the questions most associated with the first principal component for each time period below.
 
 1. 1981 - 1984
     1. F120: Is abortion justifiable? [1: Never, 10: Always] Correlation: 0.75
