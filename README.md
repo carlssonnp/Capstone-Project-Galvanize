@@ -72,6 +72,7 @@ After performing PCA, I found that in each time period, the first principal comp
 
 2. Social conservatism (questions that quantified attitudes towards homosexuality, abortion, divorce, etc. ). It was not entirely surprising to me that these two topics went hand-in-hand, as religion is often associated with conservative social views. I found it noteworthy, though, that the theme represented by the first principal component was so consistent across time: these results suggest that the single most divisive topic in human attitudes across a time span ranging from 1981 through 2014 is a combination of religious views and the social conservatism that often accompanies it! I have laid out the questions most associated with the first principal component for each time period below.
 
+
 1. 1981 - 1984
     1. F120: Is abortion justifiable? [1: Never, 10: Always] Correlation: 0.75
     2. F063: How important is God in your life? [1: Not at all important, 10: Very important] Correlation: -0.72
