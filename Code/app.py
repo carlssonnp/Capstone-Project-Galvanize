@@ -5,12 +5,7 @@ import pandas as pd
 app = Flask(__name__)
 
 ##add a line and see what happens after merge
-@app.route('/')
-def index():
-    '''
-    Creates index page
-    '''
-    return 'This is my webpage'
+
 
 
 @app.route('/submit')
